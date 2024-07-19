@@ -3,72 +3,77 @@ import AddNote from './components/AddNote';
 import SearchBar from './components/SearchBar';
 import NoteList from './components/NoteList';
 import ArchivedNotes from './components/ArchivedNotes';
-// import './style.css';
+// import './App.css';
+// import './Button.css';
 
-// aplikasi utama note book
 class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            notes: [],
-            searchQuery: '',
-            showArchived: false
-        };
-    }
-
-    handleAddNote = (note) => {
-        this.setState(prevState => ({
-            notes: [...prevState.notes, { ...note, id: Date.now() }]
-        }));
+  constructor(props) {
+    super(props);
+    this.state = {
+      notes: [
+        { id: 1, title: 'First Note', body: 'This is the first note.', archived: false, createdAt: '2024-07-01T12:34:56Z' },
+        { id: 2, title: 'Second Note', body: 'This is the second note.', archived: true, createdAt: '2024-07-02T12:34:56Z' },
+        { id: 3, title: 'Third Note', body: 'This is the third note.', archived: false, createdAt: '2024-07-03T12:34:56Z' }
+      ],
+      searchQuery: '',
+      showArchived: false
     };
+  }
 
-    handleDeleteNote = (id) => {
-        this.setState(prevState => ({
-            notes: prevState.notes.filter(note => note.id !== id)
-        }));
-    };
+  handleAddNote = (note) => {
+    this.setState(prevState => ({
+      notes: [...prevState.notes, { ...note, id: Date.now() }]
+    }));
+  };
 
-    handleArchiveNote = (id) => {
-        this.setState(prevState => ({
-            notes: prevState.notes.map(note =>
-                note.id === id ? { ...note, archived: !note.archived } : note
-            )
-        }));
-    };
+  handleDeleteNote = (id) => {
+    this.setState(prevState => ({
+      notes: prevState.notes.filter(note => note.id !== id)
+    }));
+  };
 
-    handleSearch = (query) => {
-        this.setState({ searchQuery: query });
-    };
+  handleArchiveNote = (id) => {
+    this.setState(prevState => ({
+      notes: prevState.notes.map(note =>
+        note.id === id ? { ...note, archived: !note.archived } : note
+      )
+    }));
+  };
 
-    toggleArchived = () => {
-        this.setState(prevState => ({ showArchived: !prevState.showArchived }));
-    };
+  handleSearch = (query) => {
+    this.setState({ searchQuery: query });
+  };
 
-    render() {
-        const { notes, searchQuery, showArchived } = this.state;
+  toggleArchived = () => {
+    this.setState(prevState => ({ showArchived: !prevState.showArchived }));
+  };
 
-        const filteredNotes = notes.filter(note =>
-            note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            note.body.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+  render() {
+    const { notes, searchQuery, showArchived } = this.state;
 
-        const archivedNotes = notes.filter(note => note.archived);
+    const filteredNotes = notes.filter(note =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.body.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-        return (
-            <div className="App">
-                <AddNote onAdd={this.handleAddNote} />
-                <SearchBar searchQuery={searchQuery} onSearch={this.handleSearch} />
-                <button onClick={this.toggleArchived}>
-                    {showArchived ? 'Show All Notes' : 'Show Archived Notes'}
-                </button>
-                {showArchived ? (
-                    <ArchivedNotes archivedNotes={archivedNotes} onDelete={this.handleDeleteNote} onArchive={this.handleArchiveNote} />
-                ) : (
-                    <NoteList notes={filteredNotes} onDelete={this.handleDeleteNote} onArchive={this.handleArchiveNote} />
-                )}
-            </div>
-        );
-    }
+    const archivedNotes = filteredNotes.filter(note => note.archived);
+    const activeNotes = filteredNotes.filter(note => !note.archived);
+
+    return (
+      <div className="App">
+        <AddNote onAdd={this.handleAddNote} />
+        <SearchBar searchQuery={searchQuery} onSearch={this.handleSearch} />
+        <button onClick={this.toggleArchived}>
+          {showArchived ? 'Show All Notes' : 'Show Archived Notes'}
+        </button>
+        {showArchived ? (
+          <ArchivedNotes archivedNotes={archivedNotes} onDelete={this.handleDeleteNote} onArchive={this.handleArchiveNote} />
+        ) : (
+          <NoteList notes={activeNotes} onDelete={this.handleDeleteNote} onArchive={this.handleArchiveNote} />
+        )}
+      </div>
+    );
+  }
 }
 
 export default App;
